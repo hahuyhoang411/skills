@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "title": "Test Blog Post",
+  "summary": "Pass 1: toy post. Interesting idea, but evidence is thin and the headline claim is correlational.",
+  "coverage": {
+    "paragraphs_read": "p1-p7",
+    "figures_viewed": ["f1", "f2", "f3"],
+    "frames_viewed": {"f2": [1, 2, 3, 4, 5, 6]}
+  },
+  "notes": [
+    {"key": "spike", "type": "CONCERN", "pri": "high", "quote": "third block reads from the second",
+     "note": "Quote spans an <em> tag on purpose: tests cross-node anchoring. Claim about block reads has no ablation behind it.", "links": ["fig1box"]},
+    {"key": "sample", "type": "CONCERN", "pri": "high", "quote": "a small set of 500 tokens",
+     "note": "Very small sample, single model, no seeds."},
+    {"key": "fig1box", "type": "VERIFY", "figure": "f1", "box": [0.55, 0.12, 0.4, 0.76],
+     "note": "Boxed region: the figure labels block B as the spike, but the text never gives a magnitude.", "links": ["spike"]},
+    {"key": "gif3", "type": "NOTE", "figure": "f2", "frame": 3, "box": [0.3, 0.3, 0.25, 0.4],
+     "note": "By frame 3 the dot has moved ~40% across; speed looks constant, so no sign of the claimed acceleration."},
+    {"key": "interp", "type": "SPECULATION", "quote": "great news for interpretability",
+     "note": "Decodable is not the same as understood."},
+    {"key": "lazyfig", "type": "CHECKED", "figure": "f3",
+     "note": "Whole-figure note (dashed outline): placeholder image, nothing to verify."}
+  ]
+}

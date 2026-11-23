@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "annotator",
+  "version": "0.1.0",
+  "description": "Read and annotate paper/report PDFs and web pages into color-coded reading copies (Keshav three-pass)."
+}

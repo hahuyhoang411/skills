@@ -1,0 +1,8 @@
+{
+  "name": "annotator",
+  "version": "0.1.0",
+  "description": "Read and annotate paper/report PDFs and web pages into color-coded reading copies (Keshav three-pass).",
+  "author": { "name": "hahuyhoang411" },
+  "license": "MIT",
+  "repository": "https://github.com/hahuyhoang411/skills"
+}

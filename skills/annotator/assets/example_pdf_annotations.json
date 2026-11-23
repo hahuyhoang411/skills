@@ -1,0 +1,23 @@
+{
+ "paper": {"title": "Molecular authentication of tobacco ... short-amplicon SSR profiling (TEST)"},
+ "reviewer": "Claude", "lang": "vi",
+ "pass1": {"category": "Bài phương pháp (nhận dạng ADN), thực nghiệm", "context": "Xác thực nguyên liệu thực vật; chỉ thị SSR; ADN suy thoái",
+   "correctness": "Chưa chắc: 'đặc hiệu thuốc lá' nhưng chỉ test 13 loài", "contributions": "Chỉ thị SSR ngắn + bước rửa", "clarity": "Rõ, nhưng tiêu đề và kết luận dùng hai phạm vi khác nhau",
+   "verdict": "Đáng đọc lượt 2 nếu làm xác thực ADN; có thể dừng lượt 1 nếu làm đa dạng di truyền.", "read_plan": "Lượt 2 ~1h: Hình 2–3, 5–6; lượt 3 nếu cần thiết kế đối chứng."},
+ "pages": [{"page":1,"summary":"Tiêu đề, abstract, Intro: lập luận hạn chế phương pháp cũ → khoảng trống"},
+           {"page":2,"summary":"Kết quả đặc hiệu và ngưỡng phát hiện"},
+           {"page":3,"summary":"Phụ lục: đệm TAE, bảng 8 sản phẩm"},
+           {"page":4,"summary":"Tài liệu tham khảo"}],
+ "annotations": [
+  {"page":1,"quote":"Molecular authentication of tobacco","type":"QUESTION","pass":1,"title":"Phạm vi tiêu đề","note":"Tiêu đề nói 'tobacco', nhưng abstract/kết luận dùng 'Nicotiana-derived'. Phạm vi nào mới đúng?","key":"title"},
+  {"page":1,"quote":"A washing pretreatment effectively eliminated interference from exogenous DNA","type":"CLAIM","pass":1,"priority":"high","note":"Tuyên bố bước rửa loại hết ADN ngoại lai. Phải kiểm chứng ở phần kết quả.","key":"wash"},
+  {"page":1,"quote":"nicotine is not unique to tobacco but also occurs in other Solanaceae species","type":"EVIDENCE","pass":2,"note":"Lý do 2 trong 3 lý do bỏ phương pháp hóa học.","refs":[7]},
+  {"page":1,"quote":"Previous studies used RAPD, AFLP, SSR and SNP markers in tobacco","type":"CITE","pass":2,"note":"Tài liệu 9–14: trong đó 11 (hươu nai) và 14 (bò sữa) có vẻ lạc đề.","refs":[11,14]},
+  {"page":1,"quote":"only a few studies have explored molecular markers for rapid discrimination","type":"GAP","pass":3,"priority":"high","title":"Khoảng trống #1","note":"3 khoảng trống = 3 việc bài hứa làm. Đọc kỹ đoạn này."},
+  {"page":2,"quote":"no corresponding amplification was observed in any non-tobacco species","type":"CONCERN","pass":2,"priority":"high","note":"Chỉ vài loài Cà; 'đặc hiệu' hơi mạnh. Thiếu mẫu độn thực tế.","key":"spec","links":["wash"]},
+  {"page":2,"quote":"0.08% was estimated from the gel intensity","type":"CONCERN","pass":2,"priority":"high","title":"Ngưỡng 0,08% quá mức","note":"0,1% là ngưỡng đo được; 0,08% suy ra từ cường độ băng gel (thang log) là nói quá."},
+  {"page":3,"quote":"TAE buffer was prepared with 50 mM EDTA","type":"ERROR","pass":3,"note":"Chuẩn TAE: 1 mM EDTA, không phải 50 mM."},
+  {"page":3,"quote":"this quote does not exist anywhere in the page","type":"SKIP","note":"anchor test"}
+ ],
+ "ref_notes": {"11": "Hươu nai (sika deer) – lạc đề cho thuốc lá.", "14": "Bò sữa – lạc đề."}
+}

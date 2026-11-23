@@ -1,0 +1,20 @@
+{
+  "name": "hahuyhoang411-skills",
+  "owner": {
+    "name": "hahuyhoang411"
+  },
+  "plugins": [
+    {
+      "name": "annotator",
+      "source": "./",
+      "description": "Annotate paper/report PDFs and web pages into color-coded reading copies (Keshav three-pass).",
+      "skills": [
+        "./skills/annotator"
+      ],
+      "strict": false
+    }
+  ],
+  "metadata": {
+    "description": "Agent skills from hahuyhoang411"
+  }
+}

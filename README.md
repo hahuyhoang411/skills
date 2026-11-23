@@ -11,7 +11,7 @@ Agent Skills by hahuyhoang411.
 Download **[annotator.zip](https://github.com/hahuyhoang411/skills/raw/main/dist/annotator.zip)**, then:
 
 - **Claude.ai / Claude Desktop:** Settings > Capabilities > Skills > Upload skill (menus may be named Customize > Skills).
-- **ChatGPT:** Plugins > Skills > Create > Upload from your computer. Skills are documented for Business, Enterprise, Healthcare and Edu plans; Plus/Pro unverified.
+- **ChatGPT:** Plugins > New plugin > Choose file > `annotator.zip` > Add plugin (or Plugins > Skills > Create > Upload). Plugins/Skills are documented for Business, Enterprise, Healthcare and Edu plans; Plus/Pro unverified.
 
 Then start a new chat, attach a PDF or a saved web page, and say "annotate this". In ChatGPT you can type `@annotator annotate this`.
 
@@ -41,7 +41,7 @@ Copy `skills/annotator/` into `~/.claude/skills/` (Claude Code) or your agent's 
 ## Maintainers
 
 - Add a skill: create `skills/<name>/SKILL.md`, add it to `plugins` in `.claude-plugin/marketplace.json`, add a table row above.
-- After any skill change run `sh scripts/build.sh` and commit `dist/`.
+- After any skill change run `sh scripts/build.sh` and commit `dist/`. The zip is a hybrid (skill layout + plugin layout) so one file works in every uploader.
 
 ## License
 

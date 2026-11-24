@@ -1,7 +1,7 @@
 // Shared helpers: find the article root, leaf text blocks, text nodes, and meaningful media.
 (function () {
   const BLOCK_SEL = 'p,li,h1,h2,h3,h4,h5,h6,blockquote,figcaption,pre,td,th,dd,dt,summary';
-  const MEDIA_SEL = 'img,video,svg,canvas,iframe';
+  const MEDIA_SEL = 'img,video,svg,canvas,iframe,[style*="background-image"]';
   const SKIP = 'script,style,noscript,template,.katex,math,.ga-ui,.ga-mark,.ga-box';
   const score = e => { let s = 0; e.querySelectorAll('p').forEach(p => { s += (p.textContent || '').length; }); return s; };
 
@@ -20,7 +20,8 @@
     }
     return best;
   }
-  const isMedia = e => /^(IMG|VIDEO|SVG|CANVAS|IFRAME)$/i.test(e.tagName);
+  const isBg = e => !/^(IMG|VIDEO|SVG|CANVAS|IFRAME)$/i.test(e.tagName) && /background-image\s*:[^;]*url\(/i.test(e.getAttribute('style') || '') && !e.querySelector(BLOCK_SEL);
+  const isMedia = e => /^(IMG|VIDEO|SVG|CANVAS|IFRAME)$/i.test(e.tagName) || isBg(e);
   const isLeaf = e => !e.querySelector(BLOCK_SEL);
   function visible(e) {
     const r = e.getBoundingClientRect();
@@ -38,6 +39,7 @@
   }
   function mediaList(root) {
     return [...root.querySelectorAll(MEDIA_SEL)].filter(e => {
+      if (!/^(IMG|VIDEO|SVG|CANVAS|IFRAME)$/i.test(e.tagName) && !isBg(e)) return false;
       if (e.closest('.ga-ui,.ga-box,.katex,nav,footer,button')) return false;
       if (e.parentElement && e.parentElement.closest('svg')) return false;
       // Broken images collapse to a tiny alt-text box: keep them (so they are reported as unavailable)

@@ -1,8 +1,21 @@
 {
   "name": "annotator",
-  "version": "0.1.0",
-  "description": "Read and annotate paper/report PDFs and web pages into color-coded reading copies (Keshav three-pass).",
-  "author": { "name": "hahuyhoang411" },
+  "version": "0.2.0",
+  "description": "Cross-platform research annotator: Keshav three-pass reading, color-coded text and figure annotations, self-contained annotated HTML (browser or browserless) and PDF.",
+  "author": {
+    "name": "hahuyhoang411"
+  },
+  "skills": "./skills",
+  "interface": {
+    "displayName": "Annotator",
+    "shortDescription": "Research annotator",
+    "longDescription": "Annotates research PDFs and saved web pages with Keshav's three-pass reading: evidence-led color-coded notes, precise figure-region overlays and a self-contained interactive reading copy.",
+    "developerName": "hahuyhoang411",
+    "category": "Other",
+    "capabilities": [],
+    "defaultPrompt": null
+  },
+  "keywords": [],
   "license": "MIT",
-  "skills": "./skills/"
+  "repository": "https://github.com/hahuyhoang411/skills"
 }

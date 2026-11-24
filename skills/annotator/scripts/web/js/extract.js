@@ -17,8 +17,8 @@ window.__WA_EXTRACT__ = function () {
       const cap = fig && fig.querySelector('figcaption');
       out.figures.push({
         id, index: media.indexOf(el),
-        kind: tag === 'img' ? 'img' : tag === 'iframe' ? 'embed' : tag,
-        src: el.currentSrc || el.src || el.getAttribute('data-src') || '',
+        kind: tag === 'img' ? 'img' : tag === 'iframe' ? 'embed' : /^(video|svg|canvas)$/.test(tag) ? tag : 'background',
+        src: el.currentSrc || el.src || el.getAttribute('data-src') || ((/url\((['"]?)(.*?)\1\)/.exec(el.getAttribute('style') || '') || [])[2]) || '',
         alt: (el.getAttribute('alt') || el.getAttribute('aria-label') || el.getAttribute('title') || '').trim(),
         caption: cap ? cap.textContent.replace(/\s+/g, ' ').trim() : '',
         w: Math.round(r.width), h: Math.round(r.height),
@@ -28,7 +28,7 @@ window.__WA_EXTRACT__ = function () {
       out.order.push(id);
       return;
     }
-    if (!C.isLeaf(el) || !C.visible(el)) return;
+    if (!el.matches(C.BLOCK_SEL) || !C.isLeaf(el) || !C.visible(el)) return;
     const t = C.textNodesOf(el).map(n => n.nodeValue).join('').replace(/\s+/g, ' ').trim();
     if (!t) return;
     const id = 'p' + (++pi);

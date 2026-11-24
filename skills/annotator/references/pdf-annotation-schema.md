@@ -1,4 +1,4 @@
-# annotations.json schema
+# PDF annotations.json
 
 ```json
 {
@@ -42,10 +42,13 @@
 
 `pass`: 1, 2 or 3 (shown as L1/L2/L3 on the card in Vietnamese, P1/P2/P3 in English). `priority: "high"` adds a star, a thicker border and a place on the cover.
 
-## Anchoring tips
-- Copy the quote from `work/page_NN.txt`, not from memory. Avoid quotes that span a hyphenated line break or a superscript citation; end the quote before the superscript.
-- If a short quote occurs several times on the page, lengthen it or set `occurrence`.
-- The build prints `WARN: ... could not anchor`; shorten the quote and rebuild.
+## Anchoring
+- Copy quotes from `work/page_NN.txt`; end before superscripts; avoid hyphenated line breaks.
+- Repeated quote: lengthen it or set `occurrence`.
+- `WARN: could not anchor`: shorten the quote, rebuild.
 
-## Density guide
-Cover/Abstract/Introduction/Results/Discussion: 3-8 notes per page. Methods: only METHOD/ERROR/GAP. References: only `ref_notes` for the ones that matter. Appendix/supplement: read fully, annotate only what changes your judgment.
+## Density
+Cover/Abstract/Intro/Results/Discussion: 3-8 notes per page. Methods: METHOD/ERROR/GAP only. References: `ref_notes` for those that matter. Appendix: read fully, annotate only what changes judgment.
+
+## Required
+`--passes passes.json` (`references/gates.md`). Unknown `type` is an error. Every `priority: high` note has a `key` linked from the ledger. Set `reviewer` and `lang`.

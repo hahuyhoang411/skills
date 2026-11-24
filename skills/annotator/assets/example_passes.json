@@ -1,0 +1,39 @@
+{
+  "pass1": {
+    "category": "Toy blog post, small interpretability experiment",
+    "context": "Builds on the idea that transformer blocks can be probed for intermediate answers",
+    "contribution": "Claims a spike at the third block that explains multi-step reasoning",
+    "scope": "One model, one task family, 500 tokens",
+    "title_vs_abstract_vs_conclusion": "Title is general; the conclusion extends the result to interpretability at large",
+    "verdict": "Interesting idea, but the headline claim rests on a small, single-model sample.",
+    "worth_more_time": true
+  },
+  "pass2": {
+    "ledger": [
+      {"claim": "The third block reads from the second", "where": "p3", "evidence": "One activation plot, no ablation",
+       "supports": "partly", "limits": "Correlation only; no intervention", "would_settle": "Ablate block 2 and measure block 3 output",
+       "decision": "annotate:spike"},
+      {"claim": "Result holds on a small set of 500 tokens", "where": "p4", "evidence": "Single run, no seeds",
+       "supports": "unclear", "limits": "Tiny sample, one model", "would_settle": "Repeat over seeds and models",
+       "decision": "annotate:sample"},
+      {"claim": "Background paragraph on transformers", "where": "p1", "evidence": "Textbook material", "supports": "yes",
+       "decision": "skip: standard background that does not change the verdict"}
+    ],
+    "figures": [
+      {"id": "f1", "inspected": true, "shows": "Bar chart of activation magnitude per block; block B is the tallest bar, others near zero",
+       "axes_units": "x: block index, y: activation norm (arbitrary units, no error bars)", "supports_text": "partly",
+       "missing": "No magnitude in the text, no variance across runs"},
+      {"id": "f2", "inspected": true, "shows": "Six sampled frames of an animation where a dot moves across a grid at constant speed",
+       "axes_units": "no axes; frame index only", "supports_text": "no", "missing": "No sign of the claimed acceleration"},
+      {"id": "f3", "inspected": false, "unavailable_reason": "placeholder image, nothing to inspect"}
+    ],
+    "numbers_checked": "Token count (500) and block indices are consistent between text and figure 1"
+  },
+  "pass3": {
+    "rebuild": "To show block 3 depends on block 2 I would ablate block 2 and compare against a random-block ablation across several seeds and two models.",
+    "missing_controls": ["ablation of block 2", "random-block baseline", "second model"],
+    "alternatives": ["The spike reflects layer norm scaling rather than information flow"],
+    "overclaims": ["'great news for interpretability' from one activation plot"],
+    "would_change_conclusion": "Ablation showing no drop in block 3 output would remove the main claim."
+  }
+}

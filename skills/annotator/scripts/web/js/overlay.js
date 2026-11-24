@@ -27,6 +27,7 @@
   .ga-figwrap{position:relative;display:inline-block;vertical-align:top;max-width:100%;line-height:0}
   .ga-box{position:absolute;box-sizing:border-box;border:2px solid var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);cursor:pointer;z-index:5}
   .ga-box.ga-whole{border-style:dashed;background:none}
+  .ga-figwrap-self{position:relative}
   .ga-box.ga-off{display:none}
   .ga-box .ga-badge{position:absolute;left:-2px;top:-2px;margin:0;border-radius:0 0 6px 0;vertical-align:baseline;line-height:1.1;font-size:11px;padding:2px 6px;white-space:nowrap}
   .ga-ui{font-family:system-ui,-apple-system,Segoe UI,sans-serif}
@@ -97,8 +98,18 @@
     return false;
   }
 
+  // Figure placement: the wrapper hugs the displayed media element; boxes are laid out in px against the
+  // *content* rectangle of the media (honours object-fit/object-position for img/video and viewBox +
+  // preserveAspectRatio for inline svg), so a normalised [x,y,w,h] lands on the same pixels of the figure
+  // that the PNG given to the reader showed. Re-laid-out on resize and image load (responsive pages).
+  const REPLACED = /^(IMG|VIDEO|SVG|CANVAS|IFRAME)$/i;
   function wrapFigure(el) {
     const target = el.closest('picture') || el;
+    if (!REPLACED.test(el.tagName)) {               // CSS background-image block etc.: overlay inside the element itself
+      if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+      el.classList.add('ga-figwrap-self');
+      return el;
+    }
     if (target.parentElement && target.parentElement.classList.contains('ga-figwrap')) return target.parentElement;
     const r = target.getBoundingClientRect();
     const w = document.createElement('span');
@@ -106,33 +117,86 @@
     w.style.width = Math.round(r.width) + 'px';
     target.parentNode.insertBefore(w, target);
     w.appendChild(target);
-    el.style.width = '100%'; el.style.height = 'auto';
+    const fit = el.tagName === 'IMG' || el.tagName === 'VIDEO' ? getComputedStyle(el).objectFit : 'fill';
+    if (!fit || fit === 'fill') { el.style.width = '100%'; el.style.height = 'auto'; }
+    else { w.style.height = Math.round(r.height) + 'px'; w.style.width = Math.round(r.width) + 'px'; }
     return w;
   }
 
+  function contentRect(el, wrap) {
+    const wr = wrap.getBoundingClientRect(), er = el.getBoundingClientRect();
+    let x = er.left - wr.left, y = er.top - wr.top, w = er.width, h = er.height;
+    let nw = 0, nh = 0, fit = 'fill', pos = [0.5, 0.5];
+    const tag = el.tagName.toUpperCase();
+    if (tag === 'IMG') { nw = el.naturalWidth; nh = el.naturalHeight; }
+    else if (tag === 'VIDEO') { nw = el.videoWidth; nh = el.videoHeight; }
+    else if (tag === 'SVG') {
+      const vb = (el.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(Number);
+      if (vb.length === 4 && vb[2] > 0 && vb[3] > 0) { nw = vb[2]; nh = vb[3]; }
+      const par = (el.getAttribute('preserveAspectRatio') || 'xMidYMid meet').trim().split(/\s+/);
+      if (par[0] === 'none') fit = 'fill';
+      else {
+        fit = par[1] === 'slice' ? 'cover' : 'contain';
+        pos = [/xMin/.test(par[0]) ? 0 : /xMax/.test(par[0]) ? 1 : 0.5, /YMin/.test(par[0]) ? 0 : /YMax/.test(par[0]) ? 1 : 0.5];
+      }
+    }
+    if (tag === 'IMG' || tag === 'VIDEO') {
+      const cs = getComputedStyle(el);
+      fit = cs.objectFit || 'fill';
+      pos = cs.objectPosition.split(' ').map((v, i) => v.endsWith('%') ? parseFloat(v) / 100 : (v === 'left' || v === 'top' ? 0 : v === 'right' || v === 'bottom' ? 1 : 0.5));
+      if (pos.length < 2) pos[1] = 0.5;
+    }
+    // border/padding of the element box are not part of the content box
+    const cs2 = getComputedStyle(el);
+    if (tag !== 'SVG') {
+      const bl = parseFloat(cs2.borderLeftWidth) + parseFloat(cs2.paddingLeft), bt = parseFloat(cs2.borderTopWidth) + parseFloat(cs2.paddingTop);
+      const br = parseFloat(cs2.borderRightWidth) + parseFloat(cs2.paddingRight), bb = parseFloat(cs2.borderBottomWidth) + parseFloat(cs2.paddingBottom);
+      x += bl; y += bt; w -= bl + br; h -= bt + bb;
+    }
+    if (!nw || !nh || fit === 'fill') return { x, y, w, h };
+    let s;
+    if (fit === 'contain') s = Math.min(w / nw, h / nh);
+    else if (fit === 'cover') s = Math.max(w / nw, h / nh);
+    else if (fit === 'scale-down') s = Math.min(1, Math.min(w / nw, h / nh));
+    else if (fit === 'none') s = 1;
+    else return { x, y, w, h };
+    const cw = nw * s, ch = nh * s;
+    return { x: x + (w - cw) * pos[0], y: y + (h - ch) * pos[1], w: cw, h: ch };
+  }
+
+  function layoutFigure(a) {
+    const box = a.box_el, wrap = a.wrap, el = a.media;
+    if (!box || !wrap || !el) return;
+    let c;
+    if (wrap.classList.contains('ga-figwrap-self')) {
+      const wr = wrap.getBoundingClientRect(); c = { x: 0, y: 0, w: wr.width, h: wr.height };
+    } else c = contentRect(el, wrap);
+    const [x, y, w, h] = (a.box && a.box.length === 4) ? a.box : [0, 0, 1, 1];
+    box.style.left = (c.x + x * c.w) + 'px'; box.style.top = (c.y + y * c.h) + 'px';
+    box.style.width = (w * c.w) + 'px'; box.style.height = (h * c.h) + 'px';
+  }
+
   function anchorFigure(a, MEDIA) {
-    const tail = (a.fig_src || '').slice(-40);
-    let el = tail ? MEDIA.find(e => ((e.currentSrc || e.src || '').slice(-40)) === tail) : null;
+    let el = a.figure ? document.querySelector('[data-wa-id="' + a.figure + '"]') : null;   // stable id written by fetch (browser or static)
+    if (!el) {
+      const tail = (a.fig_src || '').slice(-40);
+      el = tail ? MEDIA.find(e => ((e.currentSrc || e.src || '').slice(-40)) === tail) : null;
+    }
     if (!el && a.fig_index != null) el = MEDIA[a.fig_index];
     if (!el) return false;
     const wrap = wrapFigure(el);
     const box = document.createElement('div');
     box.className = 'ga-ui ga-box'; box.dataset.key = a.key; box.style.setProperty('--c', tcolor(a));
-    if (a.box && a.box.length === 4) {
-      const [x, y, w, h] = a.box;
-      box.style.left = x * 100 + '%'; box.style.top = y * 100 + '%';
-      box.style.width = w * 100 + '%'; box.style.height = h * 100 + '%';
-    } else {
-      box.classList.add('ga-whole');
-      box.style.left = '0'; box.style.top = '0'; box.style.width = '100%'; box.style.height = '100%';
-    }
+    if (!(a.box && a.box.length === 4)) box.classList.add('ga-whole');
     box.title = (TYPES[a.type] || TYPES.NOTE).label + ': ' + a.note;
     if (a.frame) box.dataset.frame = a.frame;
     const b = document.createElement('span');
     b.className = 'ga-badge'; b.dataset.key = a.key; b.style.setProperty('--c', tcolor(a));
     box.appendChild(b);
     wrap.appendChild(box);
-    a.el = wrap; a.box_el = box; a.badge = b; a.kindEl = 'figure';
+    a.el = wrap; a.box_el = box; a.badge = b; a.kindEl = 'figure'; a.wrap = wrap; a.media = el;
+    layoutFigure(a);
+    if (el.tagName === 'IMG' && !el.complete) el.addEventListener('load', () => layoutFigure(a));
     return true;
   }
 
@@ -297,6 +361,10 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') toggle(false); });
     launch.onclick = () => toggle();
 
+    const relayout = () => ok.forEach(a => { if (a.kindEl === 'figure') layoutFigure(a); });
+    window.addEventListener('resize', relayout);
+    window.addEventListener('load', relayout);
+    if (window.ResizeObserver) { const ro = new ResizeObserver(relayout); ok.forEach(a => { if (a.media) ro.observe(a.media); }); }
     render();
     if (store.get('ga-open', false)) toggle(true);
     window.__WA_STATUS__ = { anchored: ok.length, total: A.length, missed: missed.map(a => a.key) };

@@ -80,7 +80,7 @@ def main():
     # ---- reference list parsing ----
     refs = {}
     if ref_start:
-        cur, cur_page, cur_y = None, None, None
+        cur = None
         for pg in pages[ref_start[0]-1:]:
             for b in pg["blocks"]:
                 if pg["page"] == ref_start[0] and b["bbox"][1] <= ref_start[1] + 1: continue

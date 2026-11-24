@@ -4,45 +4,34 @@ Agent Skills by hahuyhoang411.
 
 | Skill | What it does |
 | --- | --- |
-| [annotator](skills/annotator/SKILL.md) | Read and annotate a PDF or web page into a color-coded reading copy (Keshav three-pass). Same format out as in: PDF in, PDF out; HTML in, HTML out. |
+| [annotator](skills/annotator/README.md) | Read a PDF or saved web page (Keshav three-pass) and return one color-coded, figure-aware annotated copy. PDF in → PDF out; HTML in → HTML out. |
 
 ## Install
 
-Download **[annotator.zip](https://github.com/hahuyhoang411/skills/raw/main/dist/annotator.zip)**, then:
+Download **[annotator.zip](https://github.com/hahuyhoang411/skills/raw/main/dist/annotator.zip)**.
 
-- **Claude.ai / Claude Desktop:** Settings > Capabilities > Skills > Upload skill (menus may be named Customize > Skills).
-- **ChatGPT:** Plugins > New plugin > Choose file > `annotator.zip` > Add plugin (or Plugins > Skills > Create > Upload). Plugins/Skills are documented for Business, Enterprise, Healthcare and Edu plans; Plus/Pro unverified.
+- **ChatGPT:** Plugins → Add → Upload plugin archive → choose `annotator.zip`. New chat, attach a PDF or saved page, type `@annotator annotate this`. Needs a plan with Plugins; ChatGPT has no internet by default, so give it a PDF or a saved page (see the [skill README](skills/annotator/README.md)).
+- **Claude.ai / Claude Desktop:** Settings → Capabilities → Skills → Upload skill → `annotator.zip` (menu may read Customize → Skills).
+- **Claude Code:**
+  ```
+  /plugin marketplace add hahuyhoang411/skills
+  /plugin install annotator@hahuyhoang411-skills
+  ```
+- **Other agents (Codex, Cursor, …):** `npx skills add hahuyhoang411/skills` (Node.js required).
+- **By hand:** copy `skills/annotator/` into your agent's skills folder.
 
-Then start a new chat, attach a PDF or a saved web page, and say "annotate this". In ChatGPT you can type `@annotator annotate this`.
+## Update
+Every release raises `version` (currently 0.2.0). Old installs keep running the cached version until it changes.
 
-ChatGPT's sandbox has no internet: give it a saved page (.html or .zip) or a PDF, not a live URL.
-
-### Terminal (Claude Code, Codex, Cursor and others)
-
-```
-npx skills add hahuyhoang411/skills
-```
-
-Needs Node.js. Single skill: `npx skills add hahuyhoang411/skills --skill annotator`.
-
-### Claude Code plugin
-
-```
-/plugin marketplace add hahuyhoang411/skills
-/plugin install annotator@hahuyhoang411-skills
-```
-
-Then start a new session.
-
-### By hand
-
-Copy `skills/annotator/` into `~/.claude/skills/` (Claude Code) or your agent's skills folder.
+- **ChatGPT:** open the plugin → Upload new version → `annotator.zip`.
+- **Claude.ai:** upload the new `annotator.zip` again.
+- **Claude Code:** `/plugin marketplace update hahuyhoang411-skills`, then `/plugin update annotator@hahuyhoang411-skills`, then restart the session.
+- **npx:** rerun `npx skills add hahuyhoang411/skills`.
 
 ## Maintainers
-
-- Add a skill: create `skills/<name>/SKILL.md`, add it to `plugins` in `.claude-plugin/marketplace.json`, add a table row above.
-- After any skill change run `sh scripts/build.sh` and commit `dist/`. The zip is a hybrid (skill layout + plugin layout) so one file works in every uploader.
+- Skill source: `skills/annotator/` only. `sh scripts/build.sh` checks versions and front matter, then rebuilds `dist/annotator.zip` (hybrid: skill layout + plugin layout). Commit `dist/`.
+- Release: set the same `version` in `plugin.json`, `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json` and the `.claude-plugin/marketplace.json` entry; build; push.
+- Tests: `python tests/run_tests.py` (needs pymupdf, pillow, pyyaml; Chromium optional).
 
 ## License
-
 [MIT](LICENSE)

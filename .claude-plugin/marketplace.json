@@ -11,7 +11,8 @@
       "skills": [
         "./skills/annotator"
       ],
-      "strict": false
+      "strict": false,
+      "version": "0.2.0"
     }
   ],
   "metadata": {

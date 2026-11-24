@@ -2,7 +2,7 @@
 """Build an annotated, color-coded reading copy of a paper PDF.
 
 Usage:
-  python annotate_pdf.py paper.pdf annotations.json out.pdf [--extract-dir DIR] [--font FILE] [--allow-missing]
+  python annotate_pdf.py paper.pdf annotations.json out.pdf --passes passes.json [--extract-dir DIR] [--font FILE] [--allow-missing] [--skip-gates]
 
 What it produces
   * Reading-map cover pages (verdict, legend, top issues, must-read, per-page digest, cross-links)
@@ -15,6 +15,7 @@ What it produces
 Input schema: see references/pdf-annotation-schema.md (worked example: assets/example_pdf_annotations.json)
 """
 import json, os, re, sys, datetime
+from pathlib import Path
 import pymupdf
 
 # ---------------------------------------------------------------- constants
@@ -152,9 +153,28 @@ def main():
     if len(args) < 3: sys.exit(__doc__)
     src_path, ann_path, out_path = args[:3]
     spec = json.load(open(ann_path))
-    lang = spec.get("lang", "vi"); S = STR.get(lang, STR["vi"]); tl = 1 if lang == "vi" else 2; td = 3 if lang == "vi" else 4
+
+    # gates: three-pass record + note substance (scripts/gates.py). Unknown note types are errors, not silently remapped.
+    bad_types = sorted({str(a.get("type", "MUST_READ")).upper() for a in spec.get("annotations", [])} - set(TYPES))
+    if bad_types:
+        sys.exit(f"ERROR: unsupported annotation type(s) {bad_types}. Allowed: {sorted(TYPES)} (references/pdf-annotation-schema.md)")
+    if "--skip-gates" not in sys.argv:
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        import gates
+        if not opt("--passes"):
+            sys.exit("ERROR: --passes passes.json is required: record the three passes, evidence ledger and figure inspections first (references/gates.md)")
+        anns_ = spec.get("annotations", [])
+        high = [a.get("key") for a in anns_ if a.get("priority") == "high"]
+        e1, w1 = gates.validate_passes(json.load(open(opt("--passes"))), None, [k for k in high if k], require_figure_key=True)
+        if any(k is None for k in high):
+            e1.append("every priority:'high' annotation needs a 'key' so the evidence ledger can reference it")
+        e2, w2 = gates.lint_notes(anns_)
+        gates.report(e1 + e2, w1 + w2)
+        if e1 or e2:
+            sys.exit(1)
+    lang = spec.get("lang", "en"); S = STR.get(lang, STR["vi"]); tl = 1 if lang == "vi" else 2; td = 3 if lang == "vi" else 4
     fonts = find_font(opt("--font"))
-    reviewer = spec.get("reviewer", "Claude")
+    reviewer = spec.get("reviewer", "Annotator")
     src = pymupdf.open(src_path); N = len(src)
 
     # coverage check: every page must have a review entry (forces page-by-page reading)
@@ -191,7 +211,7 @@ def main():
 
     # ---- output doc: content pages
     out = pymupdf.open()
-    content_idx, W0 = {}, {}
+    content_idx = {}
     page_cards = {}
     for a in anns: page_cards.setdefault(a["page"], []).append(a)
     overflow_of = {}
